@@ -1,4 +1,5 @@
 from flask import Flask
+from functools import wraps
 from keystoneclient.v2_0 import client
 from flask import request
 app=Flask(__name__)
@@ -11,7 +12,7 @@ def auth(f):
             auth_url=request.form['auth_url']
             if "token" in request.form:
                 try:
-                    client.Client(token=request.form['token'], auth_url)
+                    client.Client(token=request.form['token'], auth_url=auth_url)
                     return f(*args, **kwargs)
                 except: 
                     return "error authentication"
@@ -22,13 +23,13 @@ def auth(f):
                     if "tenant_name" in request.form:
                         tenant_name=request.form['tenant_name']
                         client.Client(username=username, password=password,tenant_name=tenant_name,
-                            auth_url)
+                            auth_url=auth_url)
                     elif "tenant_id" in request.form:
                         tenant_id=request.form['tenant_id']
                         client.Client(username=username, password=password,tenant_id=tenant_id,
-                        auth_url)
+                        auth_url=auth_url)
                     else:
-                        client.Client(username=username, password=password,auth_url)
+                        client.Client(username=username, password=password,auth_url=auth_url)
                     return f(*args, **kwargs)
 
                 except:
